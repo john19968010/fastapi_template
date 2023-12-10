@@ -1,0 +1,7 @@
+.python-version
+docker-compose.yml
+venv/
+.DS_Store
+.env
+todo.md
+*.pyc
