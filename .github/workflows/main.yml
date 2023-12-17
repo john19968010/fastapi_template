@@ -6,7 +6,7 @@ on:
       - "main"
 
 jobs:
-  build Image to Docker Hub:
+  Build-image-to-DockerHub:
     runs-on: ubuntu-latest
     steps:
       -
@@ -30,8 +30,8 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-template:latest
   
-  Deploy on K8s Cluster:
-    needs: [build Image to Docker Hub]
+  Deploy-on-K8s-Cluster:
+    needs: [Build-image-to-DockerHub]
     runs-on: ubuntu-latest
     env:
       nodePort: 30800
