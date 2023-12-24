@@ -4,8 +4,34 @@ on:
   push:
     branches:
       - "main"
+      - "build-sonar-step"
+
+# allows SonarQube to decorate PRs with analysis results
+permissions:
+  pull-requests: read
 
 jobs:
+  Scan-code-with-sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+      # Need to add actions/checkout before running your local action.
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # the secret create automatically in github action
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Additional arguments for the sonarcloud scanner
+          args:
+            # Unique key of your project. You can find it in SonarQube > [my project] > Project Information (top-right menu)
+            # mandatory
+            -Dsonar.projectKey=fastapi_template
+
   Build-image-to-DockerHub:
     runs-on: ubuntu-latest
     steps:
