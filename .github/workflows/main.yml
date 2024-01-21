@@ -52,7 +52,7 @@ jobs:
           scan_result=$(curl -u "${SONAR_TOKEN}:" --location "${SONAR_HOST_URL}/api/measures/component?component=fastapi_template&metricKeys=alert_status%2Cbugs%2Creliability_rating%2Cvulnerabilities%2Csecurity_hotspots%2Csecurity_rating%2Csqale_index%2Ccode_smells%2Csqale_rating%2Ccoverage%2Cduplicated_blocks%2Cduplicated_lines_density" \
           | jq '.component.measures')
           echo "${scan_result}"
-          echo "${scan_result}" >> "$SCAN_RESULT"
+          echo "scan-result=${scan_result}" >> "$GITHUB_ENV"
       -
         name: Send mail
         run: |
@@ -65,7 +65,7 @@ jobs:
               "password": "'"${MAIL_PASSWORD}"'",
               "receiver": "'"${MAIL_ACCOUNT}"'",
               "title": "Sonar Scan result of ${GITHUB_ACTION_REPOSITORY} in branch ${GITHUB_REF} and commit ${GITHUB_SHA}",
-              "content": "'"$SCAN_RESULT"'"
+              "content": "'"$scan-result"'"
           }'    
 
   # Build-image-to-DockerHub:
