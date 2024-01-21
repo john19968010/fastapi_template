@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Install packages
         run: |
-          apt-get install -y curl, jq
+          sudo apt-get install -y curl, jq
       - name: Get scan result
         run: |
           scan_result = $(curl -u "${AUTH_TOKEN}:" --location '"$SONAR_HOST_URL"/api/measures/component?component=fastapi_template&metricKeys=alert_status%2Cbugs%2Creliability_rating%2Cvulnerabilities%2Csecurity_hotspots%2Csecurity_rating%2Csqale_index%2Ccode_smells%2Csqale_rating%2Ccoverage%2Cduplicated_blocks%2Cduplicated_lines_density' \
