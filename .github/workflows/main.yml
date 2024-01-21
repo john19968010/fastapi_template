@@ -65,7 +65,8 @@ jobs:
               "account": "'"${MAIL_ACCOUNT}"'",
               "password": "'"${MAIL_PASSWORD}"'",
               "receiver": "'"${MAIL_ACCOUNT}"'",
-              "title": "'"${title}"'"
+              "title": "'"${title}"'",
+              "content": "'"${scan_result}"'"
           }'
   # Build-image-to-DockerHub:
   #   runs-on: ubuntu-latest
