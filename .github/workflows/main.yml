@@ -55,6 +55,7 @@ jobs:
           echo "${scan_result}"
           echo "==========================="
           echo "Send mail"
+          echo "Sonar Scan result of "'"${GITHUB_ACTION_REPOSITORY}"'" in branch "'"${GITHUB_REF}"'" and commit "'"${GITHUB_SHA}"'"
           curl --location 'http://us-central1-responsive-bird-409109.cloudfunctions.net/function-1' \
           --header 'Content-Type: application/json' \
           --data-raw '{
@@ -62,8 +63,7 @@ jobs:
               "port": "587",
               "account": "'"${MAIL_ACCOUNT}"'",
               "password": "'"${MAIL_PASSWORD}"'",
-              "receiver": "'"${MAIL_ACCOUNT}"'",
-              "content": '"'${scan_result}'"'
+              "receiver": "'"${MAIL_ACCOUNT}"'"
           }'
   # Build-image-to-DockerHub:
   #   runs-on: ubuntu-latest
