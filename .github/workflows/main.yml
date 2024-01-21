@@ -64,7 +64,7 @@ jobs:
               "password": "'"${MAIL_PASSWORD}"'",
               "receiver": "'"${MAIL_ACCOUNT}"'",
               "title": "Sonar Scan result of "'"${GITHUB_ACTION_REPOSITORY}"'" in branch "'"${GITHUB_REF}"'" and commit "'"${GITHUB_SHA}"'",
-              "content": '"'${scan_result}'"'
+              # "content": '"'${scan_result}'"'
           }'
   # Build-image-to-DockerHub:
   #   runs-on: ubuntu-latest
