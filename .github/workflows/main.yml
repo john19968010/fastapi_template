@@ -22,7 +22,7 @@ jobs:
         name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # the secret create automatically in github action
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -32,49 +32,85 @@ jobs:
             # mandatory
             -Dsonar.projectKey=fastapi_template
 
-  Build-image-to-DockerHub:
-    runs-on: ubuntu-latest
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      -
-        name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-template:latest
+  # Send-sonar-scan-result:
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+  #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #     MAIL_ACCOUNT: ${{ secrets.MAIL_ACCOUNT }}
+  #     MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+  #   needs: [Scan-code-with-sonarqube]
+  #   steps:
+  #     -
+  #       name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Install packages
+  #       run: |
+  #         apt-get update
+  #         apt-get install -y curl, jq
+  #     - name: Get scan result
+  #       run: |
+  #         curl -u "${AUTH_TOKEN}:" "${URL}"
+  #         curl '$SONAR_HOST_URL/api/qualitygates/project_status?projectKey=fastapi_template' \
+
+  #       echo "scan-result=$" >> "$GITHUB_ENV"
+  #     -
+  #       name: Send mail
+  #       run: |
+  #         curl --location 'http://us-central1-responsive-bird-409109.cloudfunctions.net/function-1' \
+  #         --header 'Content-Type: application/json' \
+  #         --data-raw '{
+  #             "domain": "smtp.gmail.com",
+  #             "port": "587",
+  #             "account": "'"$MAIL_ACCOUNT"'",
+  #             "password": "'"$MAIL_PASSWORD"'",
+  #             "receiver": "'"$MAIL_ACCOUNT"'",
+  #             "title": "Sonar Scan result of $GITHUB_ACTION_REPOSITORY in branch $GITHUB_REF and commit $GITHUB_SHA",
+  #         }'    
+
+  # Build-image-to-DockerHub:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     -
+  #       name: Checkout
+  #       uses: actions/checkout@v4
+  #     -
+  #       name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+  #     -
+  #       name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+  #     -
+  #       name: Build and push
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         file: ./Dockerfile
+  #         push: true
+  #         tags: ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-template:latest
   
-  Deploy-on-K8s-Cluster:
-    needs: [Build-image-to-DockerHub]
-    runs-on: ubuntu-latest
-    env:
-      nodePort: 30800
-    steps:
-      - name: Create kube config
-        run: |
-          mkdir -p $HOME/.kube/
-          echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
-      - name: Install helm
-        run: |
-          curl -LO https://get.helm.sh/helm-v3.8.0-linux-amd64.tar.gz
-          tar -zxvf helm-v3.8.0-linux-amd64.tar.gz
-          mv linux-amd64/helm /usr/local/bin/helm
-          helm version
-      - name: Deploy
-        run: |
-          helm repo add my-fastapi-template https://john19968010.github.io/my-helm-chart/helm-chart-index && \
-          helm install my-my-fastapi-chart my-fastapi-template/my-fastapi-chart --version 0.1.0 \
-          --set service.nodePort=$nodePort
+  # Deploy-on-K8s-Cluster:
+  #   needs: [Build-image-to-DockerHub]
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     nodePort: 30800
+  #   steps:
+  #     - name: Create kube config
+  #       run: |
+  #         mkdir -p $HOME/.kube/
+  #         echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+  #         chmod 600 $HOME/.kube/config
+  #     - name: Install helm
+  #       run: |
+  #         curl -LO https://get.helm.sh/helm-v3.8.0-linux-amd64.tar.gz
+  #         tar -zxvf helm-v3.8.0-linux-amd64.tar.gz
+  #         mv linux-amd64/helm /usr/local/bin/helm
+  #         helm version
+  #     - name: Deploy
+  #       run: |
+  #         helm repo add my-fastapi-template https://john19968010.github.io/my-helm-chart/helm-chart-index && \
+  #         helm install my-my-fastapi-chart my-fastapi-template/my-fastapi-chart --version 0.1.0 \
+  #         --set service.nodePort=$nodePort
