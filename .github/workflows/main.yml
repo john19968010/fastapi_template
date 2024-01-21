@@ -11,26 +11,26 @@ permissions:
   pull-requests: read
 
 jobs:
-  Scan-code-with-sonarqube:
-    runs-on: ubuntu-latest
-    steps:
-      # Need to add actions/checkout before running your local action.
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          # Additional arguments for the sonarcloud scanner
-          args:
-            # Unique key of your project. You can find it in SonarQube > [my project] > Project Information (top-right menu)
-            # mandatory
-            -Dsonar.projectKey=fastapi_template
+  # Scan-code-with-sonarqube:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     # Need to add actions/checkout before running your local action.
+  #     -
+  #       name: Checkout
+  #       uses: actions/checkout@v4
+  #     -
+  #       name: SonarQube Scan
+  #       uses: sonarsource/sonarqube-scan-action@master
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         # Additional arguments for the sonarcloud scanner
+  #         args:
+  #           # Unique key of your project. You can find it in SonarQube > [my project] > Project Information (top-right menu)
+  #           # mandatory
+  #           -Dsonar.projectKey=fastapi_template
 
   Send-sonar-scan-result:
     runs-on: ubuntu-latest
@@ -39,14 +39,14 @@ jobs:
       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       MAIL_ACCOUNT: ${{ secrets.MAIL_ACCOUNT }}
       MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-    needs: [Scan-code-with-sonarqube]
+    # needs: [Scan-code-with-sonarqube]
     steps:
       -
         name: Checkout
         uses: actions/checkout@v4
-      - name: Install packages
-        run: |
-          sudo apt-get install -y curl, jq
+      # - name: Install packages
+      #   run: |
+      #     sudo apt-get install -y curl, jq
       - name: Get scan result
         run: |
           scan_result = $(curl -u "${AUTH_TOKEN}:" --location '"$SONAR_HOST_URL"/api/measures/component?component=fastapi_template&metricKeys=alert_status%2Cbugs%2Creliability_rating%2Cvulnerabilities%2Csecurity_hotspots%2Csecurity_rating%2Csqale_index%2Ccode_smells%2Csqale_rating%2Ccoverage%2Cduplicated_blocks%2Cduplicated_lines_density' \
