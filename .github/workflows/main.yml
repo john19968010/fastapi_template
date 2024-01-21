@@ -55,7 +55,8 @@ jobs:
           echo "${scan_result}"
           echo "==========================="
           echo "Send mail"
-          echo "Sonar Scan result of "'"${GITHUB_ACTION_REPOSITORY}"'" in branch "'"${GITHUB_REF}"'" and commit "'"${GITHUB_SHA}"'"
+          title="Sonar Scan result of ${GITHUB_ACTION_REPOSITORY} in branch ${GITHUB_REF} and commit ${GITHUB_SHA}"
+          echo "${title}"
           curl --location 'http://us-central1-responsive-bird-409109.cloudfunctions.net/function-1' \
           --header 'Content-Type: application/json' \
           --data-raw '{
