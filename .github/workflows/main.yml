@@ -51,11 +51,10 @@ jobs:
         run: |
           echo "Get scan result"
           scan_result=$(curl -u "${SONAR_TOKEN}:" --location "${SONAR_HOST_URL}/api/measures/component?component=fastapi_template&metricKeys=alert_status%2Cbugs%2Creliability_rating%2Cvulnerabilities%2Csecurity_hotspots%2Csecurity_rating%2Csqale_index%2Ccode_smells%2Csqale_rating%2Ccoverage%2Cduplicated_blocks%2Cduplicated_lines_density" \
-          | jq '.component.measures' | jq -r @json)
+          | jq '.component.measures' | jq -r '.[] | "\(.metric):\(.value)"' | paste -sd, -)
           echo "${scan_result}"
           echo "==========================="
           echo "Send mail"
-          scan_result_escaped=$(printf '%s' "$scan_result" | jq -aRs .)
           curl --location 'http://us-central1-responsive-bird-409109.cloudfunctions.net/function-1' \
           --header 'Content-Type: application/json' \
           --data-raw '{
@@ -65,7 +64,7 @@ jobs:
               "password": "'"${MAIL_PASSWORD}"'",
               "receiver": "'"${MAIL_ACCOUNT}"'",
               "title": "Sonar Scan result of "'"${GITHUB_ACTION_REPOSITORY}"'" in branch "'"${GITHUB_REF}"'" and commit "'"${GITHUB_SHA}"'",
-              "content": '"${scan_result_escaped}"'
+              "content": '"'${scan_result}'"'
           }'
   # Build-image-to-DockerHub:
   #   runs-on: ubuntu-latest
