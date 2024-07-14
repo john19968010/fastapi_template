@@ -10,7 +10,6 @@ from middlewares import (
     LogRequestMiddleware,
     RequestPlugin,
 )
-from model import Base, get_db, engine, User
 import config
 import src
 
@@ -53,26 +52,8 @@ app.add_middleware(
 app.include_router(src.routes)
 
 
-def initialize(db_uri: str) -> None:
-    # Create database
-    if database_exists(db_uri):
-        return
-    create_database(db_uri)
-    Base.metadata.create_all(engine)
-
-    # depend
-    db = next(get_db())
-    default_user = User(
-        email=config.get("ADMIN_INIT_EMAIL"),
-        username=config.get("ADMIN_INIT_LOGIN"),
-        password=config.get("ADMIN_INIT_PASSWORD"),
-    )
-    db.add(default_user)
-    db.commit()
-
 
 if __name__ == "__main__":
-    initialize(config.get("SQLALCHEMY_DATABASE_URI"))
     uvicorn.run("main:app", reload=config.get("RELOAD"), host="0.0.0.0", port=10009)
 
 """
