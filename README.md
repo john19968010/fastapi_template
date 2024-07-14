@@ -22,3 +22,4 @@ Build a fastAPI template and running github action pipeline with sonarqube scan 
   1. how to integrate with github action as a plugin
   2. without register project key, create it automatically
   3. ~~Send the scan result to me via gmail~~
+.
